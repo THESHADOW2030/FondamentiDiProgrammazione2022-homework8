@@ -106,7 +106,7 @@ def playGame(board : list[list[str]], color : str):
         except:
           pass
 
-  print (moves)
+  #print (moves)
 
   if len(moves) == 0: #base case
     #check how many disks of each color are on the board
@@ -119,14 +119,54 @@ def playGame(board : list[list[str]], color : str):
         elif board[i][j] == "W":
           whiteDisks += 1
     if blackDisks > whiteDisks:
-      return (1,0,0)
+      return [1,0,0]
     elif whiteDisks > blackDisks:
-      return (0,1,0)
+      return [0,1,0]
     else:
-      return (0,0,1)
+      return [0,0,1]
+
+  
+  globalResults = [0,0,0]
+
+  for move in moves:
+    i = move[0]
+    j = move[1]
+    newBoard = copyBoard(board)
+
+    #eat the disks in the 8 directions
+    if i-1 >= 0 and newBoard[i-1][j] == otherColor:
+      newBoard[i-1][j] = color
+    if i+1 < len(board) and newBoard[i+1][j] == otherColor:
+      newBoard[i+1][j] = color
+    if j-1 >= 0 and newBoard[i][j-1] == otherColor:
+      newBoard[i][j-1] = color
+    if j+1 < len(board[i]) and newBoard[i][j+1] == otherColor:
+      newBoard[i][j+1] = color
+    if i-1 >= 0 and j-1 >= 0 and newBoard[i-1][j-1] == otherColor:
+      newBoard[i-1][j-1] = color
+    if i-1 >= 0 and j+1 < len(board[i]) and newBoard[i-1][j+1] == otherColor:
+      newBoard[i-1][j+1] = color
+    if i+1 < len(board) and j-1 >= 0 and newBoard[i+1][j-1] == otherColor:
+      newBoard[i+1][j-1] = color
+    if i+1 < len(board) and j+1 < len(board[i]) and newBoard[i+1][j+1] == otherColor:
+      newBoard[i+1][j+1] = color
+
+    #place the disk
+    newBoard[i][j] = color
+
+    #call the function again
+    results = playGame(newBoard, otherColor)
+    globalResults[0] += results[0]
+    globalResults[1] += results[1]
+    globalResults[2] += results[2]
+
+  return globalResults
 
     
-    #now we need to eat the disks of the other color for each move
+
+
+  
+
 
     
 
@@ -146,11 +186,11 @@ def dumbothello(filename : str) -> tuple[int,int,int] :
     # your code goes here
 
     board = getBoard(filename)
-    playGame(board, "B")
+    results = playGame(board, "B")
+    return tuple(results)
+
+
     
-
-
-    pass
 
 if __name__ == "__main__":
     R = dumbothello("boards/01.txt")
